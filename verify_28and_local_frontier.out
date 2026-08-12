@@ -1,0 +1,7 @@
+canonical decomposable bivectors: 2794155
+decomposable points in published P: 27
+target rank: 12
+target-containing hyperplanes checked: 4095
+decomposable-span rank histogram: 3:9 7:54 9:297 11:675 13:1323 14:27 15:1179 17:351 19:144 21:36
+maximum decomposable span rank: 21
+PASS: no 23-product outer realization exists entirely inside the published 24-product span.
