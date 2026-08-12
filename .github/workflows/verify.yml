@@ -1,0 +1,22 @@
+name: Verify R002
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify AES circuit
+        run: python verify_candidate.py
+      - name: Build and replay local frontier verifier
+        run: |
+          g++ -O3 -std=c++17 verify_28and_local_frontier.cpp -o verify_28and_local_frontier
+          ./verify_28and_local_frontier | tee /tmp/frontier.out
+          diff -u verify_28and_local_frontier.out /tmp/frontier.out
