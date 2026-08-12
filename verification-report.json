@@ -1,0 +1,58 @@
+{
+  "release": "R002",
+  "title": "AES S-box circuit optimization",
+  "status": "public computational/engineering release; no external review yet",
+  "baseline": {
+    "source": "NIST Circuits repository",
+    "commit": "4e23832e62f490aeffd8770b1285d99056b5f8bf",
+    "path": "data/slp/aes/sbox/aes-sbox-fwd-a29-ad5-g140-gd37-xx111-14.ncff.txt",
+    "blob_sha": "9c9d08980679aad4efcd1a459aa8c2cb27cf7e5b",
+    "metrics": {
+      "and": 29,
+      "xor": 97,
+      "xnor": 14,
+      "affine": 111,
+      "gates": 140,
+      "gate_depth": 37,
+      "and_depth": 5,
+      "and_depth_profile": [9, 1, 2, 2, 15]
+    }
+  },
+  "candidate": {
+    "file": "aes-sbox-fwd-a29-ad5-g139-gd36-xx110-13.ncff.txt",
+    "sha256": "1dc1d09133e90dd435f7d87b78a9e1413418ce10cf82507afd57432b5a562577",
+    "metrics": {
+      "and": 29,
+      "xor": 97,
+      "xnor": 13,
+      "affine": 110,
+      "gates": 139,
+      "gate_depth": 36,
+      "and_depth": 5,
+      "and_depth_profile": [9, 1, 2, 2, 15]
+    },
+    "exhaustive_aes_inputs_checked": 256
+  },
+  "rewrite": {
+    "baseline_operations": 5,
+    "candidate_operations": 4,
+    "preserved_downstream_functions": ["t59", "t65", "t66"],
+    "candidate_lines": [
+      "XOR t57 t37 a14",
+      "XOR t65 t48 t57",
+      "XOR t66 t45 t57",
+      "XOR t59 t42 t65"
+    ]
+  },
+  "toward_28_and": {
+    "scope": "local exclusion inside the published 24-product outer span; not a global lower bound",
+    "canonical_decomposable_bivectors": 2794155,
+    "decomposable_points_in_published_span": 27,
+    "aes_target_rank": 12,
+    "target_containing_hyperplanes_checked": 4095,
+    "maximum_decomposable_span_rank": 21,
+    "required_rank_for_23_product_outer_realization": 23,
+    "verifier": "verify_28and_local_frontier.cpp",
+    "replay_output": "verify_28and_local_frontier.out"
+  }
+}
