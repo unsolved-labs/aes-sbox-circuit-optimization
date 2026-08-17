@@ -1,0 +1,25 @@
+{
+  "release": "R002",
+  "artifacts": [
+    {
+      "path": "aes-sbox-fwd-a29-ad5-g139-gd36-xx110-13.ncff.txt",
+      "sha256": "1dc1d09133e90dd435f7d87b78a9e1413418ce10cf82507afd57432b5a562577"
+    },
+    {
+      "path": "frontier_certificate.txt",
+      "sha256": "dc99cc8576268c292be029b8d26330608f2c10c09e8a9e462f462434dd0067cc"
+    },
+    {
+      "path": "verify_28and_local_frontier.out",
+      "sha256": "3ee87d2b636bf38cefa91aee7b8f0ef10f4740e66d5baf3664d2ad5eec069544"
+    },
+    {
+      "path": "manuscript/r002-aes-sbox.md",
+      "sha256": "b759783542535c4ab29d4dc030cb0800d3cd3befa1cf4a5b8bf2443c4ff11000"
+    },
+    {
+      "path": "manuscript/r002-aes-sbox.tex",
+      "sha256": "41d119f0f789c4fc8178e5ade9c4305f15b3d507c44cf359f8acb95f39a74da7"
+    }
+  ]
+}

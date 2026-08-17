@@ -1,0 +1,206 @@
+\pdfinfoomitdate=1
+\pdftrailerid{}
+\pdfsuppressptexinfo=15
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,booktabs,array}
+\usepackage[hidelinks]{hyperref}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\title{A 139-Gate, Depth-36 Forward AES S-box Circuit\\with an Exact Local Outer-Span Exclusion}
+\author{Unsolved Labs}
+\date{2026}
+
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\xor}{\mathbin{\oplus}}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We give an explicit forward AES S-box straight-line program over \(\{\mathrm{AND},\mathrm{XOR},\mathrm{XNOR}\}\) with 29 AND gates, 97 XOR gates, 13 XNOR gates, 139 gates in total, ordinary gate depth 36, and AND-depth 5.  Relative to a frozen NIST Circuits comparison file with the same 29-AND nonlinear structure, the construction removes one affine gate and one ordinary depth level.  The replacement is a four-gate affine rewrite of a five-gate fragment, and its downstream interface is proved identical by an exhaustive Boolean identity check.  The full circuit is then verified on all 256 inputs by two independent implementations: a Python evaluator that derives the AES S-box algebraically from the FIPS 197 field definition, and a separate C++ evaluator that compares against the canonical FIPS 197 S-box table.
+
+We also record a separate local finite exclusion associated with the frozen outer-span certificate of the release.  Inside a 24-dimensional subspace of \(\bigwedge^2 \F_2^{12}\) containing a frozen 12-dimensional target subspace, exhaustive enumeration shows that every target-containing hyperplane has decomposable-point span rank at most 21.  Hence no 23-product outer realization exists entirely inside this frozen 24-product span.  This second statement is intentionally local and is not a global 28/29-AND lower bound for the AES S-box.
+\end{abstract}
+
+\section{Introduction}
+The Advanced Encryption Standard specifies an 8-bit substitution box (S-box) as part of the AES round transformation \cite{fips197}.  Boolean straight-line programs for the S-box are useful as compact reference objects for circuit-complexity research and for implementation studies in settings where nonlinear gates are especially costly.  NIST maintains a public Circuit Complexity repository containing such straight-line programs \cite{nistcircuits,nistproject}.
+
+This release starts from one immutable NIST comparison point: commit
+\texttt{4e23832e62f490aeffd8770b1285d99056b5f8bf}, file
+\texttt{aes-sbox-fwd-a29-ad5-g140-gd37-xx111-14.ncff.txt}.  That file records 29 AND, 97 XOR, 14 XNOR, 140 total gates, ordinary depth 37, and AND-depth 5.  The R002 circuit retains the same nonlinear gate count and AND-depth while replacing a five-gate affine fragment by four affine gates.  The resulting circuit has 139 total gates and depth 36.
+
+The contribution is deliberately modest in scope.  It is an exact optimization of a frozen public circuit, not a proof of global total-gate optimality.  Likewise, the local exterior-algebra calculation in Section~\ref{sec:frontier} excludes a 23-product realization only inside the frozen 24-product outer span encoded by the release certificate.
+
+\section{Circuit model and AES specification}
+A circuit is a strict straight-line program whose inputs are bits \(U_0,\ldots,U_7\) and whose gates are binary AND, XOR, and XNOR.  Each non-input wire is assigned exactly once and may depend only on previously defined wires.  XNOR is interpreted as
+\[
+  \operatorname{XNOR}(a,b)=1\xor a\xor b.
+\]
+The ordinary depth of an input is zero, and the depth of a gate is one plus the maximum depth of its inputs.  AND-depth counts only nonlinear layers: an AND gate adds one to the maximum AND-depth of its inputs, while XOR and XNOR do not.
+
+The primary verifier derives the AES S-box from the standard field construction.  Bytes are interpreted in \(\F_2[x]/(x^8+x^4+x^3+x+1)\).  For nonzero input \(x\), let \(y=x^{-1}\), with \(0^{-1}\) interpreted as 0 for the S-box construction.  The output byte is the FIPS 197 affine transform of \(y\), equivalently
+\[
+S(x)=y\xor \operatorname{rotl}_8(y,1)\xor\operatorname{rotl}_8(y,2)
+      \xor\operatorname{rotl}_8(y,3)\xor\operatorname{rotl}_8(y,4)\xor 0x63.
+\]
+The independent C++ verifier uses the canonical 256-byte FIPS table instead of reusing this field-arithmetic implementation.
+
+\begin{table}[t]
+\centering
+\begin{tabular}{lrr}
+\toprule
+Metric & frozen NIST file & R002 candidate\\
+\midrule
+AND & 29 & 29\\
+XOR & 97 & 97\\
+XNOR & 14 & 13\\
+Total gates & 140 & 139\\
+Ordinary gate depth & 37 & 36\\
+AND-depth & 5 & 5\\
+AND-depth profile & \multicolumn{2}{c}{9, 1, 2, 2, 15}\\
+\bottomrule
+\end{tabular}
+\caption{Frozen comparison metrics and released candidate metrics.}
+\label{tab:metrics}
+\end{table}
+
+\section{Frozen source and candidate identity}
+The NIST source is pinned by repository commit, path, and Git blob SHA; the complete provenance record is in \texttt{SOURCE\_AUDIT.md}.  The released candidate is
+\begin{center}
+\texttt{aes-sbox-fwd-a29-ad5-g139-gd36-xx110-13.ncff.txt}
+\end{center}
+with SHA-256
+\begin{center}
+\small\texttt{1dc1d09133e90dd435f7d87b78a9e1413418ce10cf82507afd57432b5a562577}.
+\end{center}
+The NIST file itself records that its circuit follows from transformations of the public \texttt{umizame/S-box\_29-AND} construction.  We therefore make no broad priority claim for the 29-AND architecture; the comparison in this paper is strictly to the immutable NIST file above.
+
+\section{The four-gate affine rewrite}
+Let addition denote XOR in \(\F_2\), and write XNOR as \(1+a+b\).  The relevant five-gate fragment in the frozen NIST file is
+\begin{align*}
+ b_{57}&=t_{37}+t_{42},\\
+ b_{58}&=b_{57}+a_{14},\\
+ b_{59}&=b_{58}+t_{48},\\
+ b_{65}&=t_{42}+b_{59},\\
+ b_{66}&=1+t_{46}+b_{59}.
+\end{align*}
+R002 replaces it by
+\begin{align*}
+ c_{57}&=t_{37}+a_{14},\\
+ c_{65}&=t_{48}+c_{57},\\
+ c_{66}&=t_{45}+c_{57},\\
+ c_{59}&=t_{42}+c_{65}.
+\end{align*}
+Immediately,
+\[
+  c_{65}=t_{37}+a_{14}+t_{48}=b_{65},\qquad
+  c_{59}=t_{42}+c_{65}=b_{59}.
+\]
+For the remaining downstream wire, the unchanged upstream circuit gives
+\[
+ t_7=U_0+t_5,\quad t_9=U_6+t_5,\quad
+ t_{43}=1+U_0+t_{42},\quad
+ t_{46}=t_9+t_{43},\quad
+ t_{47}=U_6+t_{45},\quad
+ t_{48}=t_7+t_{47}.
+\]
+These identities imply
+\begin{align*}
+1+t_{46}+t_{42}+t_{48}
+ &=1+(t_9+t_{43})+t_{42}+(t_7+U_6+t_{45})\\
+ &=t_9+U_0+t_7+U_6+t_{45}\\
+ &=t_{45}.
+\end{align*}
+Therefore
+\[
+ b_{66}=1+t_{46}+b_{59}
+       =1+t_{46}+t_{42}+c_{65}
+       =t_{45}+c_{57}=c_{66}.
+\]
+Thus the fragment preserves \((t_{59},t_{65},t_{66})\) exactly while using four rather than five affine gates.  The script \texttt{verify\_rewrite\_identity.py} independently checks the same identity on all 128 assignments to the seven free upstream Boolean quantities needed by the derivation.
+
+\begin{proposition}[Affine rewrite]
+The R002 four-gate replacement and the pinned NIST five-gate fragment induce identical values on downstream wires \(t_{59},t_{65},t_{66}\) for every assignment consistent with the unchanged upstream identities above.
+\end{proposition}
+
+\section{Full-circuit verification}
+\begin{theorem}[Released circuit]\label{thm:circuit}
+The released NCFF circuit has 29 AND, 97 XOR, 13 XNOR, and 139 total gates; ordinary gate depth 36; AND-depth 5 with profile \((9,1,2,2,15)\); and its output equals the FIPS 197 forward AES S-box on every 8-bit input.
+\end{theorem}
+
+The theorem is replayed in two independent implementations.
+
+\paragraph{Python path.}
+\texttt{verify\_candidate.py} parses the NCFF gate list, evaluates all 256 inputs in parallel as Python bitsets, recomputes all metrics/depths, and derives the reference AES S-box through finite-field inversion and the affine transform.
+
+\paragraph{C++ path.}
+\texttt{verify\_candidate\_independent.cpp} has a separate parser, evaluates one input at a time, independently recomputes all metrics/depths, and compares to the canonical 256-byte FIPS 197 S-box table.  The distinct parsing, execution, and reference-specification paths reduce shared implementation risk.
+
+Both checks are exhaustive: no random testing or floating-point arithmetic is involved.
+
+\section{Local 23-product exclusion}\label{sec:frontier}
+This section concerns a separate finite certificate.  Let \(V=\F_2^{12}\).  The file \texttt{frontier\_certificate.txt} specifies 24 factor pairs \((u_i,v_i)\in V^2\).  Their decomposable bivectors \(u_i\wedge v_i\) span a 24-dimensional subspace
+\[
+  P\subseteq \bigwedge
+  ^2 V.
+\]
+The same file gives 12 independent coordinate rows spanning a target subspace \(T\subseteq P\) of dimension 12.
+
+A nonzero decomposable bivector over \(\F_2\) corresponds to a 2-dimensional subspace of \(V\).  The number of such subspaces is the Gaussian binomial
+\[
+ {12\brack 2}_2=\frac{(2^{12}-1)(2^{12}-2)}{(2^2-1)(2^2-2)}=2{,}794{,}155.
+\]
+The verifiers enumerate each of these exactly once, determine which lie in \(P\), and find 27 distinct decomposable points in the frozen outer span.
+
+Any 23-dimensional subspace of a 24-dimensional \(P\) is a hyperplane.  A hyperplane containing \(T\) is the kernel of a nonzero linear functional annihilating \(T\).  Since \(\dim P-\dim T=12\), there are exactly
+\[
+  2^{12}-1=4095
+\]
+such hyperplanes.  For each hyperplane, the verifiers compute the rank of the span of all decomposable points of \(P\) lying in that hyperplane.  The exact histogram is
+\[
+3{:}9,\;7{:}54,\;9{:}297,\;11{:}675,\;13{:}1323,\;14{:}27,\;
+15{:}1179,\;17{:}351,\;19{:}144,\;21{:}36.
+\]
+In particular the maximum rank is 21.
+
+\begin{theorem}[Frozen local outer-span exclusion]\label{thm:local}
+No target-containing hyperplane of the frozen 24-dimensional span \(P\) is generated by 23 decomposable bivectors from \(P\).  Hence no 23-product outer realization exists entirely inside this frozen span/target certificate model.
+\end{theorem}
+
+The C++ verifier and an independently written Python verifier both replay the complete enumeration.  They share only the frozen input certificate.  The provenance of those frozen generator and target rows as the intended local AES outer-span model is recorded as an explicit trust assumption in \texttt{SOURCE\_AUDIT.md} and \texttt{VERIFICATION.md}.
+
+\section{Reproducibility and trust boundary}
+From a clean checkout, the complete mathematical replay is
+\begin{verbatim}
+python3 verify_release.py
+\end{verbatim}
+using only Python's standard library and a C++17 compiler.  This command checks the candidate hash, both whole-circuit verifiers, the affine rewrite identity, both local-frontier implementations, and the frozen expected frontier output.
+
+The final correctness oracle does not include the search or AI-generation process that produced the candidate.  It checks only frozen public artifacts.  This release currently does not use Lean: the main statements are finite and are exhaustively replayed by independent exact implementations, while the principal remaining non-mechanical trust item is provenance of the local certificate rows rather than numerical soundness of the calculation.
+
+\section{Scope and limitations}
+Theorem~\ref{thm:circuit} is an exact claim about the released circuit.  It does not establish global minimum total gate count.  Theorem~\ref{thm:local} is intentionally local: it says nothing about 23-product outer realizations outside the frozen span and therefore does not prove a global 28-AND impossibility or 29-AND lower bound.  The release also makes no implementation-specific area, timing, power, FHE, MPC, or zero-knowledge performance claim.
+
+External specialist review is pending.
+
+\begin{thebibliography}{9}
+\bibitem{fips197}
+National Institute of Standards and Technology.
+\emph{Advanced Encryption Standard (AES)}. FIPS 197-upd1, 2023.
+\url{https://doi.org/10.6028/NIST.FIPS.197-upd1}.
+
+\bibitem{nistcircuits}
+National Institute of Standards and Technology.
+\emph{Circuit Complexity: Circuits repository}.
+\url{https://github.com/usnistgov/Circuits}.
+R002 comparison pinned to commit \texttt{4e23832e62f490aeffd8770b1285d99056b5f8bf}.
+
+\bibitem{nistproject}
+National Institute of Standards and Technology.
+\emph{Circuit Complexity Project}.
+\url{https://csrc.nist.gov/Projects/circuit-complexity}.
+\end{thebibliography}
+\end{document}

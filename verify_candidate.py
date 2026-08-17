@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Independent verifier for the Unsolved Labs 139-gate AES S-box circuit.
+"""Primary exact verifier for the Unsolved Labs 139-gate AES S-box circuit.
 
 Checks:
 - strict straight-line execution with no use-before-definition
 - exact gate tally
 - gate depth and AND-depth
 - AND-depth profile
-- exhaustive equality on all 256 inputs against an independently derived AES S-box
+- exhaustive equality on all 256 inputs against an AES S-box derived from FIPS 197 field arithmetic
 """
 from collections import Counter
 from pathlib import Path
@@ -107,12 +107,12 @@ def main() -> None:
         expected = aes_sbox(x)
         assert got == expected, f"AES mismatch at {x:02x}: {got:02x} != {expected:02x}"
 
-    print("PASS")
+    print("PASS primary Python verifier")
     print("gates: 139 = 29 AND + 97 XOR + 13 XNOR")
     print("gate depth: 36")
     print("AND-depth: 5")
     print("AND-depth profile: 9 1 2 2 15")
-    print("AES truth table: 256/256 inputs matched")
+    print("FIPS 197 algebraic S-box: 256/256 inputs matched")
 
 
 if __name__ == "__main__":

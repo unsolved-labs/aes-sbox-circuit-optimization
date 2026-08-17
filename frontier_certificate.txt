@@ -1,0 +1,41 @@
+# R002 local 23-product outer-span certificate over F2.
+# GENERATOR rows are 12-bit factor vectors u and v (hex); the verifier computes u wedge v.
+# TARGET rows are 24-bit coordinate vectors spanning the frozen 12-dimensional target subspace.
+[GENERATORS]
+0c0 00c
+080 008
+040 004
+84c cc8
+848 cc4
+448 c8c
+8c8 c84
+4c8 c4c
+020 002
+010 001
+030 003
+132 221
+131 223
+331 212
+121 213
+321 232
+0e0 00e
+090 009
+070 007
+97e ee9
+979 ee7
+779 e9e
+9e9 e97
+7e9 e7e
+[TARGET]
+030606
+030500
+050303
+060300
+97481f
+97b8b8
+b83057
+67efb8
+6748ef
+300030
+30df00
+67df57
