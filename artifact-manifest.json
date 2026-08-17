@@ -12,14 +12,7 @@
     {
       "path": "verify_28and_local_frontier.out",
       "sha256": "3ee87d2b636bf38cefa91aee7b8f0ef10f4740e66d5baf3664d2ad5eec069544"
-    },
-    {
-      "path": "manuscript/r002-aes-sbox.md",
-      "sha256": "b759783542535c4ab29d4dc030cb0800d3cd3befa1cf4a5b8bf2443c4ff11000"
-    },
-    {
-      "path": "manuscript/r002-aes-sbox.tex",
-      "sha256": "41d119f0f789c4fc8178e5ade9c4305f15b3d507c44cf359f8acb95f39a74da7"
     }
-  ]
+  ],
+  "note": "The manifest freezes theorem-bearing data artifacts and expected certificate output. Documentation/manuscript source identity is supplied by the immutable Git commit rather than duplicated as hand-maintained hashes."
 }
