@@ -1,0 +1,26 @@
+{
+  "release": "R002",
+  "title": "AES S-box circuit optimization",
+  "status": "public computational research release",
+  "external_review": "pending",
+  "ai_generated_research_artifact": true,
+  "claims": [
+    {
+      "id": "C1",
+      "statement": "The released forward AES S-box circuit has 29 AND, 97 XOR, 13 XNOR, 139 total gates, gate depth 36, AND-depth 5, profile [9,1,2,2,15], and matches the FIPS 197 S-box on all 256 inputs."
+    },
+    {
+      "id": "C2",
+      "statement": "Relative to the pinned NIST 140-gate/depth-37 comparison circuit, the released candidate removes one XNOR gate and one ordinary depth level while preserving the 29-AND count and AND-depth 5."
+    },
+    {
+      "id": "C3",
+      "statement": "Within the frozen 24-product outer span and target subspace encoded by frontier_certificate.txt, no 23-product outer realization exists. This is a local exclusion, not a global AES multiplicative-complexity lower bound."
+    }
+  ],
+  "candidate": {
+    "path": "aes-sbox-fwd-a29-ad5-g139-gd36-xx110-13.ncff.txt",
+    "sha256": "1dc1d09133e90dd435f7d87b78a9e1413418ce10cf82507afd57432b5a562577"
+  },
+  "verification_entrypoint": "python3 verify_release.py"
+}

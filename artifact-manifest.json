@@ -1,0 +1,18 @@
+{
+  "release": "R002",
+  "artifacts": [
+    {
+      "path": "aes-sbox-fwd-a29-ad5-g139-gd36-xx110-13.ncff.txt",
+      "sha256": "1dc1d09133e90dd435f7d87b78a9e1413418ce10cf82507afd57432b5a562577"
+    },
+    {
+      "path": "frontier_certificate.txt",
+      "sha256": "dc99cc8576268c292be029b8d26330608f2c10c09e8a9e462f462434dd0067cc"
+    },
+    {
+      "path": "verify_28and_local_frontier.out",
+      "sha256": "3ee87d2b636bf38cefa91aee7b8f0ef10f4740e66d5baf3664d2ad5eec069544"
+    }
+  ],
+  "note": "The manifest freezes theorem-bearing data artifacts and expected certificate output. Documentation/manuscript source identity is supplied by the immutable Git commit rather than duplicated as hand-maintained hashes."
+}

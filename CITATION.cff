@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this research artifact, cite the R002 release and its pinned repository version."
+title: "R002: AES S-box circuit optimization"
+type: software
+authors:
+  - name: "Unsolved Labs"
+version: "R002"
+repository-code: "https://github.com/unsolved-labs/aes-sbox-circuit-optimization"
+url: "https://unsolved-labs.github.io/results/r002-aes-sbox/"
+abstract: >-
+  A 139-gate, depth-36 forward AES S-box circuit with exhaustive independent
+  equivalence verification and a separate local 23-product outer-span exclusion.
+keywords:
+  - AES
+  - S-box
+  - Boolean circuit
+  - circuit complexity
+  - computer-assisted proof

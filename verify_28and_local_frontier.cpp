@@ -1,56 +1,203 @@
-#include <bits/stdc++.h>
-using namespace std; using U=unsigned __int128;
-static int msb(U x){uint64_t hi=(uint64_t)(x>>64); if(hi) return 64+63-__builtin_clzll(hi); uint64_t lo=(uint64_t)x; return lo?63-__builtin_clzll(lo):-1;}
-static U ph(const string&s){U x=0;for(char c:s){int v;if(c>='0'&&c<='9')v=c-'0';else if(c>='a'&&c<='f')v=c-'a'+10;else if(c>='A'&&c<='F')v=c-'A'+10;else continue;x=(x<<4)|v;}return x;}
-struct E{U v[66]{}; uint32_t c[66]{}; int r=0; bool add(U x,uint32_t co=0){while(x){int p=msb(x);if(v[p]){x^=v[p];co^=c[p];}else{v[p]=x;c[p]=co;r++;return true;}}return false;} bool coords(U x,uint32_t &co)const{co=0;for(int p=65;p>=0;p--)if(v[p]&&((x>>p)&1)){x^=v[p];co^=c[p];}return x==0;}};
-static int r32(const vector<uint32_t>&xs){uint32_t b[32]{};int r=0;for(uint32_t x:xs){while(x){int p=31-__builtin_clz(x);if(b[p])x^=b[p];else{b[p]=x;r++;break;}}}return r;}
-int main(){
-const char* rows=R"WIT(A 128c
-0c0 00c 00000000303000000
-080 008 00000000200000000
-040 004 00000000001000000
-84c cc8 20848001233200000
-848 cc4 20848003321200000
-448 c8c 204c8002311200000
-8c8 c84 204c8003223200000
-4c8 c4c 20c88002213200000
-020 002 00000000000004000
-010 001 00000000000000008
-030 003 00000000000006018
-132 221 01001844000044099
-131 223 01001844000026189
-331 212 01001024000066109
-121 213 01001024000024199
-321 232 01000864000064119
-0e0 00e 0000000038381c000
-090 009 00000000240000048
-070 007 00000000001c0e038
-97e ee9 3797bddde7bbdd4bf
-979 ee7 3797bddfba5f2f3cf
-779 e9e 377ef53e79deef74f
-9e9 e97 377ef53fa67b3d3bf
-7e9 e7e 37e9ccfe65fafd73f
-COEFF
-030606
-030500
-050303
-060300
-97481f
-97b8b8
-b83057
-67efb8
-6748ef
-300030
-30df00
-67df57)WIT";
- istringstream in(rows); string a,b,c; in>>a>>b; vector<U> p; vector<uint32_t> q; while(in>>a){if(a=="COEFF")break;in>>b>>c;p.push_back(ph(c));}while(in>>a)q.push_back(stoul(a,nullptr,16)); if(p.size()!=24||q.size()!=12)return 2;
- int pi[12][12]; memset(pi,-1,sizeof(pi)); int kk=0; for(int i=0;i<12;i++)for(int j=i+1;j<12;j++)pi[i][j]=kk++;
- static U wb[4096][12]; for(int u=0;u<4096;u++)for(int j=0;j<12;j++){U w=0;for(int i=0;i<12;i++)if((u>>i&1)&&i!=j)w^=U(1)<<pi[min(i,j)][max(i,j)];wb[u][j]=w;}
- auto wedge=[&](uint16_t u,uint16_t v){U w=0;while(v){int j=__builtin_ctz(v);v&=v-1;w^=wb[u][j];}return w;};
- E P; for(int i=0;i<24;i++) if(!P.add(p[i],1u<<i)) return 3; if(P.r!=24)return 4;
- vector<uint32_t> dc; dc.reserve(32); uint64_t total=0;
- for(uint16_t u=1;u<4096;u++)for(uint16_t v=u+1;v<4096;v++){uint16_t wv=u^v;if(!(v<wv))continue;total++;uint32_t co;if(P.coords(wedge(u,v),co))dc.push_back(co);} sort(dc.begin(),dc.end()); dc.erase(unique(dc.begin(),dc.end()),dc.end());
- uint32_t rr[12]; for(int i=0;i<12;i++)rr[i]=q[i]; vector<int> piv; int r=0; for(int col=23;col>=0&&r<12;col--){int sel=-1;for(int i=r;i<12;i++)if(rr[i]>>col&1){sel=i;break;}if(sel<0)continue;swap(rr[r],rr[sel]);for(int i=0;i<12;i++)if(i!=r&&(rr[i]>>col&1))rr[i]^=rr[r];piv.push_back(col);r++;} if(r!=12)return 5; bool isp[24]{};for(int x:piv)isp[x]=1; vector<int> freec;for(int i=0;i<24;i++)if(!isp[i])freec.push_back(i);vector<uint32_t> nb;for(int f:freec){uint32_t x=1u<<f;for(int i=0;i<12;i++)if(rr[i]>>f&1)x|=1u<<piv[i];nb.push_back(x);} if(nb.size()!=12)return 6;
- map<int,int> hist; int best=0; for(uint32_t m=1;m<(1u<<12);m++){uint32_t l=0;for(int i=0;i<12;i++)if(m>>i&1)l^=nb[i];vector<uint32_t> inside;for(uint32_t x:dc)if((__builtin_parity(x&l)==0))inside.push_back(x);int z=r32(inside);hist[z]++;best=max(best,z);} 
- cout<<"canonical decomposable bivectors: "<<total<<"\n"; cout<<"decomposable points in published P: "<<dc.size()<<"\n"; cout<<"target rank: 12\n"; cout<<"target-containing hyperplanes checked: 4095\n"; cout<<"decomposable-span rank histogram:";for(auto [k,v]:hist)cout<<" "<<k<<":"<<v;cout<<"\n";cout<<"maximum decomposable span rank: "<<best<<"\n"; if(total!=2794155||dc.size()!=27||best!=21)return 7; cout<<"PASS: no 23-product outer realization exists entirely inside the published 24-product span.\n";return 0;
+#include <algorithm>
+#include <array>
+#include <cstdint>
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <vector>
+
+using U128 = unsigned __int128;
+
+static int msb(U128 x) {
+    const uint64_t hi = static_cast<uint64_t>(x >> 64);
+    if (hi) return 64 + 63 - __builtin_clzll(hi);
+    const uint64_t lo = static_cast<uint64_t>(x);
+    return lo ? 63 - __builtin_clzll(lo) : -1;
+}
+
+struct TaggedBasis {
+    std::array<U128, 66> vec{};
+    std::array<uint32_t, 66> coord{};
+    int rank = 0;
+
+    bool add(U128 x, uint32_t c) {
+        while (x) {
+            int p = msb(x);
+            if (vec[p]) { x ^= vec[p]; c ^= coord[p]; }
+            else { vec[p] = x; coord[p] = c; ++rank; return true; }
+        }
+        return false;
+    }
+
+    bool coordinates(U128 x, uint32_t& c) const {
+        c = 0;
+        for (int p = 65; p >= 0; --p) {
+            if (vec[p] && ((x >> p) & 1)) { x ^= vec[p]; c ^= coord[p]; }
+        }
+        return x == 0;
+    }
+};
+
+static int rank24(const std::vector<uint32_t>& xs) {
+    std::array<uint32_t, 24> basis{};
+    int r = 0;
+    for (uint32_t x : xs) {
+        while (x) {
+            const int p = 31 - __builtin_clz(x);
+            if (basis[p]) x ^= basis[p];
+            else { basis[p] = x; ++r; break; }
+        }
+    }
+    return r;
+}
+
+struct Certificate {
+    std::vector<std::pair<uint16_t,uint16_t>> generators;
+    std::vector<uint32_t> target_rows;
+};
+
+static Certificate read_certificate(const std::string& path) {
+    std::ifstream in(path);
+    if (!in) throw std::runtime_error("cannot open certificate: " + path);
+    enum class Section { none, generators, target } section = Section::none;
+    Certificate cert;
+    std::string line;
+    while (std::getline(in, line)) {
+        const auto first = line.find_first_not_of(" \t\r\n");
+        if (first == std::string::npos || line[first] == '#') continue;
+        if (line.compare(first, 12, "[GENERATORS]") == 0) { section = Section::generators; continue; }
+        if (line.compare(first, 8, "[TARGET]") == 0) { section = Section::target; continue; }
+        std::istringstream ss(line.substr(first));
+        if (section == Section::generators) {
+            std::string a,b,extra;
+            if (!(ss >> a >> b) || (ss >> extra)) throw std::runtime_error("bad generator row: " + line);
+            const auto u = static_cast<uint16_t>(std::stoul(a,nullptr,16));
+            const auto v = static_cast<uint16_t>(std::stoul(b,nullptr,16));
+            if (!u || !v || u >= 4096 || v >= 4096) throw std::runtime_error("generator outside F2^12");
+            cert.generators.emplace_back(u,v);
+        } else if (section == Section::target) {
+            std::string q,extra;
+            if (!(ss >> q) || (ss >> extra)) throw std::runtime_error("bad target row: " + line);
+            const auto x = static_cast<uint32_t>(std::stoul(q,nullptr,16));
+            if (x >= (1u<<24)) throw std::runtime_error("target coordinate outside F2^24");
+            cert.target_rows.push_back(x);
+        } else {
+            throw std::runtime_error("data outside a certificate section");
+        }
+    }
+    if (cert.generators.size() != 24 || cert.target_rows.size() != 12)
+        throw std::runtime_error("certificate must contain 24 generators and 12 target rows");
+    return cert;
+}
+
+int main(int argc, char** argv) {
+    try {
+        const std::string path = argc > 1 ? argv[1] : "frontier_certificate.txt";
+        const auto cert = read_certificate(path);
+
+        int pair_index[12][12];
+        std::fill(&pair_index[0][0], &pair_index[0][0] + 144, -1);
+        int k = 0;
+        for (int i=0;i<12;++i) for (int j=i+1;j<12;++j) pair_index[i][j] = k++;
+        if (k != 66) throw std::runtime_error("internal pair-index error");
+
+        static U128 wedge_basis[4096][12];
+        for (int u=0;u<4096;++u) {
+            for (int j=0;j<12;++j) {
+                U128 w = 0;
+                for (int i=0;i<12;++i) if (((u>>i)&1) && i!=j) {
+                    const int lo = std::min(i,j), hi = std::max(i,j);
+                    w ^= U128(1) << pair_index[lo][hi];
+                }
+                wedge_basis[u][j] = w;
+            }
+        }
+        const auto wedge = [&](uint16_t u, uint16_t v) {
+            U128 w = 0;
+            while (v) {
+                const int j = __builtin_ctz(v);
+                v &= static_cast<uint16_t>(v-1);
+                w ^= wedge_basis[u][j];
+            }
+            return w;
+        };
+
+        TaggedBasis P;
+        for (size_t i=0;i<cert.generators.size();++i) {
+            const auto [u,v] = cert.generators[i];
+            if (!P.add(wedge(u,v), 1u << i)) throw std::runtime_error("outer generator dependence");
+        }
+        if (P.rank != 24) throw std::runtime_error("published outer span does not have rank 24");
+
+        std::vector<uint32_t> decomposable_coordinates;
+        uint64_t total = 0;
+        for (uint16_t u=1;u<4096;++u) {
+            for (uint16_t v=u+1;v<4096;++v) {
+                const uint16_t z = u ^ v;
+                if (!(v < z)) continue; // unique representative u < v < u+v for each 2-plane over F2
+                ++total;
+                uint32_t c = 0;
+                if (P.coordinates(wedge(u,v), c)) decomposable_coordinates.push_back(c);
+            }
+        }
+        std::sort(decomposable_coordinates.begin(), decomposable_coordinates.end());
+        decomposable_coordinates.erase(std::unique(decomposable_coordinates.begin(), decomposable_coordinates.end()), decomposable_coordinates.end());
+
+        std::vector<uint32_t> rr = cert.target_rows;
+        std::vector<int> pivots;
+        int r = 0;
+        for (int col=23; col>=0 && r<12; --col) {
+            int sel = -1;
+            for (int i=r;i<12;++i) if ((rr[i]>>col)&1u) { sel=i; break; }
+            if (sel < 0) continue;
+            std::swap(rr[r], rr[sel]);
+            for (int i=0;i<12;++i) if (i!=r && ((rr[i]>>col)&1u)) rr[i] ^= rr[r];
+            pivots.push_back(col);
+            ++r;
+        }
+        if (r != 12) throw std::runtime_error("target rows do not have rank 12");
+
+        std::array<bool,24> is_pivot{};
+        for (int p : pivots) is_pivot[p] = true;
+        std::vector<uint32_t> annihilator_basis;
+        for (int free_col=0; free_col<24; ++free_col) if (!is_pivot[free_col]) {
+            uint32_t x = 1u << free_col;
+            for (int i=0;i<12;++i) if ((rr[i]>>free_col)&1u) x |= 1u << pivots[i];
+            annihilator_basis.push_back(x);
+        }
+        if (annihilator_basis.size() != 12) throw std::runtime_error("unexpected annihilator dimension");
+
+        std::map<int,int> histogram;
+        int best = 0;
+        for (uint32_t mask=1; mask < (1u<<12); ++mask) {
+            uint32_t functional = 0;
+            for (int i=0;i<12;++i) if ((mask>>i)&1u) functional ^= annihilator_basis[i];
+            std::vector<uint32_t> inside;
+            for (uint32_t x : decomposable_coordinates)
+                if ((__builtin_parity(x & functional)) == 0) inside.push_back(x);
+            const int z = rank24(inside);
+            ++histogram[z];
+            best = std::max(best, z);
+        }
+
+        std::cout << "canonical decomposable bivectors: " << total << "\n";
+        std::cout << "published outer-span rank: " << P.rank << "\n";
+        std::cout << "decomposable points in published span: " << decomposable_coordinates.size() << "\n";
+        std::cout << "target rank: 12\n";
+        std::cout << "target-containing hyperplanes checked: 4095\n";
+        std::cout << "decomposable-span rank histogram:";
+        for (const auto& [rank,count] : histogram) std::cout << " " << rank << ":" << count;
+        std::cout << "\nmaximum decomposable span rank: " << best << "\n";
+
+        if (total != 2794155ULL || decomposable_coordinates.size() != 27 || best != 21)
+            throw std::runtime_error("frozen local-frontier certificate totals changed");
+        std::cout << "PASS: no 23-product outer realization exists entirely inside the frozen 24-product span.\n";
+        return 0;
+    } catch (const std::exception& e) {
+        std::cerr << "FAIL: " << e.what() << "\n";
+        return 1;
+    }
 }

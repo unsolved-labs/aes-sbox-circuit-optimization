@@ -1,7 +1,8 @@
 {
   "release": "R002",
   "title": "AES S-box circuit optimization",
-  "status": "public computational/engineering release; no external review yet",
+  "status": "public computational research release; external specialist review pending",
+  "verification_entrypoint": "python3 verify_release.py",
   "baseline": {
     "source": "NIST Circuits repository",
     "commit": "4e23832e62f490aeffd8770b1285d99056b5f8bf",
@@ -31,28 +32,45 @@
       "and_depth": 5,
       "and_depth_profile": [9, 1, 2, 2, 15]
     },
-    "exhaustive_aes_inputs_checked": 256
-  },
-  "rewrite": {
-    "baseline_operations": 5,
-    "candidate_operations": 4,
-    "preserved_downstream_functions": ["t59", "t65", "t66"],
-    "candidate_lines": [
-      "XOR t57 t37 a14",
-      "XOR t65 t48 t57",
-      "XOR t66 t45 t57",
-      "XOR t59 t42 t65"
+    "exhaustive_aes_inputs_checked": 256,
+    "verifiers": [
+      {
+        "file": "verify_candidate.py",
+        "implementation": "Python bit-sliced evaluator",
+        "reference_specification": "FIPS 197 algebraic GF(2^8) inverse plus affine transform"
+      },
+      {
+        "file": "verify_candidate_independent.cpp",
+        "implementation": "independent C++ scalar evaluator",
+        "reference_specification": "canonical FIPS 197 256-byte S-box table"
+      }
     ]
   },
-  "toward_28_and": {
-    "scope": "local exclusion inside the published 24-product outer span; not a global lower bound",
+  "rewrite": {
+    "baseline_affine_gates": 5,
+    "candidate_affine_gates": 4,
+    "preserved_downstream_wires": ["t59", "t65", "t66"],
+    "exhaustive_free_assignments_checked": 128,
+    "verifier": "verify_rewrite_identity.py"
+  },
+  "local_frontier": {
+    "scope": "local exclusion inside the frozen 24-product outer span encoded by frontier_certificate.txt; not a global lower bound",
+    "certificate_file": "frontier_certificate.txt",
+    "certificate_sha256": "dc99cc8576268c292be029b8d26330608f2c10c09e8a9e462f462434dd0067cc",
+    "outer_span_rank": 24,
     "canonical_decomposable_bivectors": 2794155,
-    "decomposable_points_in_published_span": 27,
-    "aes_target_rank": 12,
+    "decomposable_points_in_frozen_span": 27,
+    "target_rank": 12,
     "target_containing_hyperplanes_checked": 4095,
     "maximum_decomposable_span_rank": 21,
-    "required_rank_for_23_product_outer_realization": 23,
-    "verifier": "verify_28and_local_frontier.cpp",
-    "replay_output": "verify_28and_local_frontier.out"
+    "verifiers": [
+      "verify_28and_local_frontier.cpp",
+      "verify_frontier_independent.py"
+    ],
+    "frozen_replay_output": "verify_28and_local_frontier.out"
+  },
+  "formal_proof": {
+    "lean_present": false,
+    "reason": "The release claims are finite and are exhaustively replayed by independent exact implementations. The principal remaining non-mechanical trust item is provenance of the frozen local-frontier certificate rows rather than approximate arithmetic or solver soundness."
   }
 }

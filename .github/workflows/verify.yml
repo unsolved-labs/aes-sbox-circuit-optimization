@@ -6,17 +6,28 @@ on:
   workflow_dispatch:
 
 jobs:
-  verify:
+  release-verification:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Verify AES circuit
-        run: python verify_candidate.py
-      - name: Build and replay local frontier verifier
+      - name: Exact release verification
+        run: python3 verify_release.py
+
+  manuscript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install TeX toolchain
         run: |
-          g++ -O3 -std=c++17 verify_28and_local_frontier.cpp -o verify_28and_local_frontier
-          ./verify_28and_local_frontier | tee /tmp/frontier.out
-          diff -u verify_28and_local_frontier.out /tmp/frontier.out
+          sudo apt-get update
+          sudo apt-get install -y latexmk texlive-latex-base texlive-latex-recommended texlive-fonts-recommended lmodern ghostscript
+      - name: Build manuscript from public source
+        run: bash manuscript/build.sh
+      - name: Upload manuscript PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: r002-aes-sbox-manuscript
+          path: manuscript/r002-aes-sbox.pdf
